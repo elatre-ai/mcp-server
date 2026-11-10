@@ -6,7 +6,11 @@ async function bookingRequest(path: string, init: RequestInit): Promise<{ status
   const baseUrl = loadConfig().bookingApiBaseUrl;
   const response = await fetch(`${baseUrl}${path}`, {
     ...init,
-    headers: { accept: "application/json", "content-type": "application/json" },
+    headers: {
+      accept: "application/json",
+      "content-type": "application/json",
+      "ngrok-skip-browser-warning": "true",
+    },
     signal: AbortSignal.timeout(20_000),
   });
   const body = await response.json().catch(() => ({ error_message: "Booking API returned a non-JSON response" }));
@@ -19,7 +23,7 @@ export function registerBookingTools(server: McpServer): void {
     {
       title: "List booking slots",
       description:
-        "List open booking slots. startTime and endTime are wall-clock times in timezone. timezone is optional and defaults to UTC. Each slot includes startTime in UTC and startTimeLocal in 12-hour form.",
+        "List open booking slots. startTime and endTime are wall-clock times in timezone (for example 2026-12-10T00:00:00 through 2026-12-11T00:00:00). timezone is a Calendly label or IANA name such as India Standard Time or Asia/Calcutta. When omitted, UTC is used. Each slot includes startTime in UTC and startTimeLocal in 12-hour form. Pass the same timezone to book_slot.",
       inputSchema: listBookingSlotsSchema.shape,
       annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: true },
     },
@@ -43,7 +47,7 @@ export function registerBookingTools(server: McpServer): void {
     {
       title: "Book a slot",
       description:
-        "Book a Calendly slot. startTime is a UTC value from list_booking_slots. firstName, lastName, phoneNumber, and conversationId are optional. phoneNumber must include the country code, such as +14155550123. conversationId is the ElevenLabs conversation id. Omit it or send null when there is no conversation to update.",
+        "Book a Calendly slot. startTime is the UTC value from list_booking_slots (for example 2026-12-10T09:30:00.000Z). timezone must match the list call so the invite uses the user's timezone, such as Asia/Calcutta or India Standard Time. firstName, lastName, phoneNumber, conversationId, and source are optional. phoneNumber must include the country code, such as +14155550123. conversationId is the ElevenLabs conversation id.",
       inputSchema: bookSlotSchema.shape,
       annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: true },
     },

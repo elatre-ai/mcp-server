@@ -118,7 +118,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
       env.MCP_REQUESTS_PER_MINUTE,
       120
     ),
-    bookingApiBaseUrl: (env.BOOKING_API_BASE_URL?.trim() || "https://aff8-106-51-234-14.ngrok-free.app/api").replace(/\/$/, ""),
+    bookingApiBaseUrl: (env.BOOKING_API_BASE_URL?.trim() || "http://127.0.0.1:5001/api/v1").replace(/\/$/, ""),
   });
 
   if (config.transport === "http") {
